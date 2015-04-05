@@ -1,0 +1,48 @@
+############################################################
+# +------------------------------------------------------+ #
+# |             Drewpercraft - Swear.jar                 | #
+# +------------------------------------------------------+ #
+############################################################
+# The list of bad words
+blacklist: 
+  - shit
+  - damn 
+  - piss
+  - fuck
+  - bitch
+  - cock
+  - dick
+  - cunt
+  - pussy
+  - prick
+  - ass
+  - faggot
+  - bastard
+  - testword
+whitelist:
+  - hitech
+  - shoes
+  - glass
+  - bass
+  - stash
+  - bash        
+# If you prefer to use regexp, then define it here
+#regexp: 
+
+# How much should the player be fined
+fine: 1000
+
+# How much damage the player should take (in hearts)
+damage: 2
+
+# Should the player be smited for swearing?
+smite: true
+
+# What message should the player see privately. [player] will be substituted with the player's name
+message: "{PLAYER}, you know better than that."
+
+# What message will all players see
+broadcast: "{PLAYER} has made a donation to the swear jar."
+
+# Who gets the swear jar cash
+owner: hitechwizard

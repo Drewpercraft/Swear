@@ -1,0 +1,32 @@
+name: Swear
+main: com.drewpercraft.Swear.Swear
+version: 1.1
+author: hitechwizard
+website: www.drewpercraft.com
+description: Get rid of curse words from your server!
+depend: [Vault]
+commands:
+  swear:
+      description: Creates a swear jar that prevents objectionable words in chat messages
+      usage: /swear <info|owner|damage|fine>
+      permission: swear.info
+      permission-message: You don't have permissions to see that.
+
+  swear:
+      description: Creates a swear jar that prevents objectionable words in chat messages
+      usage: /swear <info|owner|damage|fine|setowner|setdamage|setfine|refund>
+      permission: swear.config
+      permission-message: You don't have permissions to see that.
+          
+permissions:
+  swear.*:
+          description: Gives user access to all Swear commands
+          children:
+              swear.config: true
+              swear.info: true
+  swear.config:
+          description: Gives user access to change Swear setup
+          default: false
+  swear.info:
+          description: Allows user to see what the price is to swear.
+          default: false
