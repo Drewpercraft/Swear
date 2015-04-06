@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -16,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -35,6 +37,22 @@ public class Swear extends JavaPlugin implements Listener {
 	Boolean smite;
 	String owner;
 	Player player;
+	
+	class KickPlayer implements Callable<Void> {
+		Player player;
+		String message;
+		
+		KickPlayer(Player p, String m) { 
+			player = p;
+			message = m;
+		}
+		
+		@Override
+		public Void call() {
+			player.kickPlayer(message);
+			return null;
+		}
+	}
 	
 	public void onEnable(){ 
 		if (!setupEconomy() ) {
@@ -115,6 +133,7 @@ public class Swear extends JavaPlugin implements Listener {
 		}
 		
 		if (pottyMouth) {
+			event.setCancelled(true);
 			player.damage(damage);
 			if (smite) {
 				player.getWorld().strikeLightningEffect(player.getLocation());
@@ -133,11 +152,9 @@ public class Swear extends JavaPlugin implements Listener {
 					getServer().getPlayer(owner).sendMessage("$" + fine + " was put in your swear jar because " + player.getName() + " said: " + event.getMessage());
 				}
 				if (donation < fine) {
-					player.kickPlayer("You ran out of money for the swear jar.");
+					Bukkit.getServer().getScheduler().callSyncMethod(this, new KickPlayer(player, "You ran out of money for the swear jar."));
 				}
 			}
-			
-			event.setCancelled(true);
 			
 			if (playerMessage.length() > 0) {
 				player.sendMessage(playerMessage.replace("{PLAYER}", player.getDisplayName()));
