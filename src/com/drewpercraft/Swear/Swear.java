@@ -171,8 +171,8 @@ public class Swear extends JavaPlugin implements Listener {
 		message = event.getMessage();
 		message = message.replaceAll("wtf", "well that's fantastic");
 		message = message.replaceAll("WTF", "Well That's Fantastic");
-        if (message.toLowerCase() == "yo" && player.getName() != "hitechwizard") {
-            message = "Yo™ is Copyright © 2014 by Hitechwizard. Unauthorized use without royalty payment is strictly prohibited.";
+        if (message.toLowerCase().startsWith("yo ") && !player.getName().equals("hitechwizard")) {
+            message = "Yo™ is Copyright © 2015 by Hitechwizard. Unauthorized use without royalty payment is strictly prohibited.";
         }
 		event.setMessage(message);
 	}
