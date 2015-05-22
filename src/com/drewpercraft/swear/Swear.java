@@ -1,4 +1,4 @@
-package com.drewpercraft.Swear;
+package com.drewpercraft.swear;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -17,9 +17,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import net.milkbowl.vault.economy.Economy;
+
+import com.graywolf336.jail.beans.Cell;
+import com.graywolf336.jail.beans.Jail;
+import com.graywolf336.jail.beans.Prisoner;
+import com.graywolf336.jail.JailsAPI;
+
 
 public class Swear extends JavaPlugin implements Listener {
 
@@ -37,6 +42,8 @@ public class Swear extends JavaPlugin implements Listener {
 	Boolean smite;
 	String owner;
 	Player player;
+	
+	Boolean useJailAPI = false;
 	
 	class KickPlayer implements Callable<Void> {
 		Player player;
@@ -62,6 +69,10 @@ public class Swear extends JavaPlugin implements Listener {
         }
 		
 		reload();
+		
+		if (getServer().getPluginManager().getPlugin("Jail") != null) {
+            useJailAPI = true;
+        }
 		
 		getServer().getPluginManager().registerEvents(this, this);
 		log.info("Swear.Jar has been enabled.");
@@ -140,19 +151,36 @@ public class Swear extends JavaPlugin implements Listener {
 			}
 			if (fine > 0) {
 				double donation = fine;
-				if (!economy.has(player.getName(), donation)) {
-					donation = economy.getBalance(player.getName()); 
+				if (!economy.has(player, donation)) {
+					donation = economy.getBalance(player); 
 				}
-				economy.withdrawPlayer(player.getName(), donation);
+				economy.withdrawPlayer(player, donation);
 				economy.depositPlayer(owner, donation);
 				log.info("Swear jar added " + donation + " to " + owner + ".");
 
 				Player ownerPlayer = getServer().getPlayer(owner);
 				if (ownerPlayer instanceof Player && ownerPlayer.isOnline()) {
-					getServer().getPlayer(owner).sendMessage("$" + fine + " was put in your swear jar because " + player.getName() + " said: " + event.getMessage());
+					getServer().getPlayer(owner).sendMessage("$" + donation + " was put in your swear jar because " + player.getName() + " said: " + event.getMessage());
 				}
 				if (donation < fine) {
-					Bukkit.getServer().getScheduler().callSyncMethod(this, new KickPlayer(player, "You ran out of money for the swear jar."));
+				    if (useJailAPI)
+				    {
+				    	try {
+				    		if (!JailsAPI.getJailManager().isPlayerJailed(player.getUniqueId())) { 
+					    		Prisoner prisoner = new Prisoner(player, JailsAPI.getTimeFromString("5m"), "Potty Mouth");
+					    		Jail jail = JailsAPI.getJailManager().getNearestJail(player);
+					    		JailsAPI.getPrisonerManager().prepareJail(jail, jail.getFirstEmptyCell(), player, prisoner);
+				    		}else{
+				    			JailsAPI.getJailManager().getPrisoner(player.getUniqueId()).addTime(JailsAPI.getTimeFromString("1m"));
+				    		}
+				    	}
+				    	catch (Exception e) {
+				    		log.warning("Attempt to jail player failed");
+				    		log.warning(e.getMessage());
+				    	}
+				    }else{
+				    	Bukkit.getServer().getScheduler().callSyncMethod(this, new KickPlayer(player, "You ran out of money for the swear jar."));
+				    }
 				}
 			}
 			

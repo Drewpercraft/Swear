@@ -1,10 +1,11 @@
 name: Swear
-main: com.drewpercraft.Swear.Swear
+main: com.drewpercraft.swear.Swear
 version: 1.1
 author: hitechwizard
 website: www.drewpercraft.com
 description: Get rid of curse words from your server!
 depend: [Vault]
+softdepend: [Jail]
 commands:
   swear:
       description: Creates a swear jar that prevents objectionable words in chat messages
