@@ -20,7 +20,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import net.milkbowl.vault.economy.Economy;
 
-import com.graywolf336.jail.beans.Cell;
 import com.graywolf336.jail.beans.Jail;
 import com.graywolf336.jail.beans.Prisoner;
 import com.graywolf336.jail.JailsAPI;
@@ -72,6 +71,7 @@ public class Swear extends JavaPlugin implements Listener {
 		
 		if (getServer().getPluginManager().getPlugin("Jail") != null) {
             useJailAPI = true;
+            log.info("Jail plugin found. Players will be jailed instead of kicked.");
         }
 		
 		getServer().getPluginManager().registerEvents(this, this);
@@ -163,12 +163,25 @@ public class Swear extends JavaPlugin implements Listener {
 					getServer().getPlayer(owner).sendMessage("$" + donation + " was put in your swear jar because " + player.getName() + " said: " + event.getMessage());
 				}
 				if (donation < fine) {
-				    if (useJailAPI)
-				    {
+				    if (useJailAPI) {
 				    	try {
 				    		if (!JailsAPI.getJailManager().isPlayerJailed(player.getUniqueId())) { 
 					    		Prisoner prisoner = new Prisoner(player, JailsAPI.getTimeFromString("5m"), "Potty Mouth");
 					    		Jail jail = JailsAPI.getJailManager().getNearestJail(player);
+					    		if (jail.getFirstEmptyCell() == null) {
+					    			//Find any jail
+					    			Iterator<Jail> jailIT = JailsAPI.getJailManager().getJails().iterator();
+					    			while (jailIT.hasNext()) {
+					    				jail = jailIT.next();
+					    				if (jail.getFirstEmptyCell() != null) {
+					    					break;
+					    				}
+					    			}
+					    		}
+					    		//If there are no empty cells, kick the player
+					    		if (jail.getFirstEmptyCell() == null) {
+					    			Bukkit.getServer().getScheduler().callSyncMethod(this, new KickPlayer(player, "You ran out of money for the swear jar."));
+					    		}
 					    		JailsAPI.getPrisonerManager().prepareJail(jail, jail.getFirstEmptyCell(), player, prisoner);
 				    		}else{
 				    			JailsAPI.getJailManager().getPrisoner(player.getUniqueId()).addTime(JailsAPI.getTimeFromString("1m"));
