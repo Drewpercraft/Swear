@@ -46,7 +46,21 @@
 			<url>http://dev.drewpercraft.com/repositories/pub_snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
+    <profiles>
+        <profile>
+            <id>jenkins</id>
+            <activation>
+                <property>
+                    <name>env.BUILD_NUMBER</name>
+                </property>
+            </activation>
+            <properties>
+                <project.build.number>${env.BUILD_NUMBER}</project.build.number>
+            </properties>
+        </profile>
+    </profiles>
+    	
 	<dependencies>
 		<dependency>
             <groupId>net.milkbowl.vault</groupId>
