@@ -29,6 +29,9 @@ public class Swear extends JavaPlugin implements Listener {
 
 	private static final Logger log = Logger.getLogger("Minecraft");
 
+	private static final String GOLD = "\u00A76";
+	private static final String BLUE = "\u00A79";
+	
 	public static Economy economy = null;
 	
 	List<String> blacklist;
@@ -277,7 +280,7 @@ public class Swear extends JavaPlugin implements Listener {
 	}
 	
 	public boolean commandVersion(CommandSender sender, String[] args) {
-		sender.sendMessage("&6Swear.jar: &9" + getDescription().getVersion());
+		sender.sendMessage(GOLD + "Swear.jar: " + BLUE + getDescription().getVersion());
 		return true;
 	}
 	
