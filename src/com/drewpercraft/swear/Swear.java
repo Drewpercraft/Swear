@@ -241,6 +241,7 @@ public class Swear extends JavaPlugin implements Listener {
 					commandDamage(sender, args);
 					success = true;
 				}
+				if (userCommand.equalsIgnoreCase("version")) success = commandVersion(sender, args);
 				if (success) return true;
 				
 				
@@ -272,6 +273,11 @@ public class Swear extends JavaPlugin implements Listener {
 			}
 		}
 		return false;
+	}
+	
+	public boolean commandVersion(CommandSender sender, String[] args) {
+		sender.sendMessage("&6Swear.jar: &9" + getDescription().getVersion());
+		return true;
 	}
 	
 	public boolean commandOwner(CommandSender sender, String[] args) {
