@@ -4,8 +4,7 @@ version: maven-version-number
 author: hitechwizard
 website: www.drewpercraft.com
 description: Get rid of curse words from your server!
-depend: [Vault]
-softdepend: [Jail]
+depend: [Vault, Jail]
 commands:
   swear:
       description: Creates a swear jar that prevents objectionable words in chat messages
