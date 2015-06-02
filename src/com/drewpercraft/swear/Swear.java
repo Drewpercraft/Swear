@@ -236,6 +236,7 @@ public class Swear extends JavaPlugin implements Listener {
 				if (userCommand.equalsIgnoreCase("fine")) success = commandFine(sender, args);
 				if (userCommand.equalsIgnoreCase("damage")) success = commandDamage(sender, args);
 				if (userCommand.equalsIgnoreCase("info")) {
+					commandVersion(sender, args);
 					commandOwner(sender, args);
 					commandFine(sender, args);
 					commandDamage(sender, args);
