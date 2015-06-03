@@ -63,6 +63,52 @@ public class Swear extends JavaPlugin implements Listener {
 		}
 	}
 	
+	class JailPlayer implements Callable<Void> {
+		Player player;
+		String message;
+		String time;
+		
+		JailPlayer(Player p, String t, String m) { 
+			player = p;
+			time = t;
+			message = m;
+		}
+		
+		@Override
+		public Void call() {
+	    	try {
+	    		if (!JailsAPI.getJailManager().isPlayerJailed(player.getUniqueId())) { 
+		    		Prisoner prisoner = new Prisoner(player, JailsAPI.getTimeFromString(time), message);
+		    		Jail jail = JailsAPI.getJailManager().getNearestJail(player);
+		    		if (jail.getFirstEmptyCell() == null) {
+		    			//Find any jail
+		    			Iterator<Jail> jailIT = JailsAPI.getJailManager().getJails().iterator();
+		    			while (jailIT.hasNext()) {
+		    				jail = jailIT.next();
+		    				if (jail.getFirstEmptyCell() != null) {
+		    					break;
+		    				}
+		    			}
+		    		}
+		    		//If there are no empty cells, kick the player
+		    		if (jail.getFirstEmptyCell() == null) {
+		    			player.kickPlayer("You ran out of money for the swear jar.");
+		    		}else{
+		    			JailsAPI.getPrisonerManager().prepareJail(jail, jail.getFirstEmptyCell(), player, prisoner);
+		    		}
+	    		}else{
+	    			JailsAPI.getJailManager().getPrisoner(player.getUniqueId()).addTime(JailsAPI.getTimeFromString("1m"));
+	    		}
+	    	}
+	    	catch (Exception e) {
+	    		log.warning("Attempt to jail player failed");
+	    		log.warning(e.getMessage());
+	    	}
+
+			return null;
+		}
+	}
+	
 	public void onEnable(){ 
 		if (!setupEconomy() ) {
             log.info(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
@@ -167,33 +213,7 @@ public class Swear extends JavaPlugin implements Listener {
 				}
 				if (donation < fine) {
 				    if (useJailAPI) {
-				    	try {
-				    		if (!JailsAPI.getJailManager().isPlayerJailed(player.getUniqueId())) { 
-					    		Prisoner prisoner = new Prisoner(player, JailsAPI.getTimeFromString("5m"), "Potty Mouth");
-					    		Jail jail = JailsAPI.getJailManager().getNearestJail(player);
-					    		if (jail.getFirstEmptyCell() == null) {
-					    			//Find any jail
-					    			Iterator<Jail> jailIT = JailsAPI.getJailManager().getJails().iterator();
-					    			while (jailIT.hasNext()) {
-					    				jail = jailIT.next();
-					    				if (jail.getFirstEmptyCell() != null) {
-					    					break;
-					    				}
-					    			}
-					    		}
-					    		//If there are no empty cells, kick the player
-					    		if (jail.getFirstEmptyCell() == null) {
-					    			Bukkit.getServer().getScheduler().callSyncMethod(this, new KickPlayer(player, "You ran out of money for the swear jar."));
-					    		}
-					    		JailsAPI.getPrisonerManager().prepareJail(jail, jail.getFirstEmptyCell(), player, prisoner);
-				    		}else{
-				    			JailsAPI.getJailManager().getPrisoner(player.getUniqueId()).addTime(JailsAPI.getTimeFromString("1m"));
-				    		}
-				    	}
-				    	catch (Exception e) {
-				    		log.warning("Attempt to jail player failed");
-				    		log.warning(e.getMessage());
-				    	}
+				    	Bukkit.getServer().getScheduler().callSyncMethod(this, new JailPlayer(player, "5m", "Potty Mouth"));
 				    }else{
 				    	Bukkit.getServer().getScheduler().callSyncMethod(this, new KickPlayer(player, "You ran out of money for the swear jar."));
 				    }
